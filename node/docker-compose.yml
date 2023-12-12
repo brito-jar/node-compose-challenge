@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+
+  db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_DATABASE: desafio
+      MYSQL_ROOT_PASSWORD: root
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    networks:
+      - node-network
+
+  app:
+    build:
+      context: ./app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app:/usr/src/app
+    working_dir: /usr/src/app
+    command: npm start
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - node-network
+
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/html:/usr/share/nginx/html
+      - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - node-network
+    depends_on:
+      app:
+        condition: service_started
+
+networks:
+  node-network:
+    driver: bridge

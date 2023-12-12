@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio NGINX</title>
+</head>
+
+<body>
+    <h1>FullCycle Rocks!</h1>
+
+    <h2>Lista de usuários</h2>
+    <ul>
+    </ul>
+    <script>
+        fetch('http://localhost/api/')
+            .then(response => response.json())
+            .then(data => {
+                let list = document.createElement('ul');
+                document.body.appendChild(list);
+                data.forEach(user => {
+                    let item = document.createElement('li');
+                    item.innerText = user.name;
+                    list.appendChild(item);
+                });
+            })
+            .catch(error => console.error('Erro ao buscar dados:', error));
+    </script>
+</body>
+
+</html>
